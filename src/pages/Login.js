@@ -16,6 +16,7 @@ const Login = (props) => {
     }
     alert ('Usuario Logeado')
     handleClean()
+    props.navigation.navigate("Home")
   }
 
   const handleClean = () => {
