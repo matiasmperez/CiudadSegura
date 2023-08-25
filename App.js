@@ -1,6 +1,6 @@
 
 import { StyleSheet, } from 'react-native';
-import { Login, Bienvenido, Register, Olvidopassword, Home} from './src/pages/'
+import { Login, Bienvenido, Register, Olvidopassword, Home, Modal} from './src/pages/'
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
