@@ -3,6 +3,10 @@ import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, Image } from
 import Button from '../components/Button';
 import Colors from '../../constants/colors';
 import Input from '../components/Input';
+import axios from 'axios'
+import url from '../../constants/url';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const Login = (props) => {
 
@@ -14,10 +18,34 @@ const Login = (props) => {
       alert('Los campos no pueden estar vacios');
       return
     }
-    alert ('Usuario Logeado')
-    handleClean()
-    props.navigation.navigate("Home")
+
+    axios.post(url + 'api/users/auth', {
+      email: email,
+      password: password,
+  })
+      .then(response => {
+        alert('Usuario logeado correctamente')
+        handleClean()
+        props.navigation.navigate("Home")
+        storeData(response.data.jwt)
+        
+
+
+      })
+      .catch(error => {
+          alert('Usuario o contraseña incorrecto')
+          handleClean()
+      });
+   
   }
+
+  const storeData = async (value) => {
+    try {
+      await AsyncStorage.setItem('jwt', value);
+    } catch (e) {
+      console.log(e)
+    }
+  };
 
   const handleClean = () => {
     setEmail('')

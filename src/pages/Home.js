@@ -39,23 +39,23 @@ const Home = () => {
       const initialRegion = {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
-        latitudeDelta: 0.02, // Ajusta la latitudDelta y longitudDelta según tus necesidades
+        latitudeDelta: 0.02, 
         longitudeDelta: 0.02,
       };
-      mapRef.current.animateToRegion(initialRegion, 1000); // Animación de 1 segundo
+      mapRef.current.animateToRegion(initialRegion, 1000); 
     }
   }, [location]);
 
   const focusOnMarker = () => {
     if (mapRef.current) {
-      mapRef.current.animateToRegion(initialRegion, 1000); // Animación de 1 segundo
+      mapRef.current.animateToRegion(initialRegion, 1000);
     }
   };
 
   let initialRegion = {
     latitude: 37.78825,
     longitude: -122.4324,
-    latitudeDelta: 0.02, // Ajusta la latitudDelta y longitudDelta según tus necesidades
+    latitudeDelta: 0.02, 
     longitudeDelta: 0.02,
   };
 

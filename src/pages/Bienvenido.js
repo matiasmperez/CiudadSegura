@@ -1,9 +1,25 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { View, Text, StyleSheet, ImageBackground , Image} from 'react-native';
 import Colors from '../../constants/colors';
 import Button from '../components/Button';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Bienvenido = ({ navigation }) => {
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const value = await AsyncStorage.getItem('jwt');
+        if (value !== null) {
+          navigation.navigate('Home');
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    };
+
+    getData();
+  }, []);
 
   const handleRegisterPress = () => {
     navigation.navigate('Register');

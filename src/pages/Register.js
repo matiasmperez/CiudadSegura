@@ -3,6 +3,8 @@ import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, Image} from 
 import Button from '../components/Button';
 import Colors from '../../constants/colors';
 import Input from '../components/Input';
+import url from '../../constants/url';
+import axios from 'axios'
 
 const Register = (props) => {
 
@@ -21,8 +23,25 @@ const Register = (props) => {
       alert('Las contraseñas no coinciden');
       return
     }
-    alert('Usuario registrado correctamente')
-    handleClean()
+    
+
+     axios.post(url + 'api/users/register', {
+      email: email,
+      nombre: nombre,
+      apellido: apellido,
+      telefono: telefono,
+      password: password,
+  })
+      .then(function () {
+        alert('Usuario registrado correctamente')
+        handleClean()
+        props.navigation.navigate("Login")
+      })
+      .catch(function (error) {
+          console.log(error);
+      });
+
+   
 
   }
 
