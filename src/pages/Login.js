@@ -24,7 +24,6 @@ const Login = (props) => {
       password: password,
   })
       .then(response => {
-        alert('Usuario logeado correctamente')
         handleClean()
         props.navigation.navigate("Home")
         storeData(response.data.jwt)

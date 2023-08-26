@@ -4,14 +4,18 @@ import MapView, { Marker } from 'react-native-maps';
 import Device from 'expo-device';
 import * as Location from 'expo-location';
 import { Linking } from 'react-native';
+import { SimpleLineIcons, MaterialCommunityIcons, FontAwesome , AntDesign} from '@expo/vector-icons'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-const Home = () => {
+
+
+const Home = ({navigation}) => {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false); // Estado para el modal
-  const [newMarkerCoords, setNewMarkerCoords] = useState(null); // Coordenadas del nuevo marcador
-  const [noteText, setNoteText] = useState(''); // Texto de la nota para el marcador
+  const [modalVisible, setModalVisible] = useState(false);
+  const [newMarkerCoords, setNewMarkerCoords] = useState(null);
+  const [noteText, setNoteText] = useState('');
 
   const mapRef = React.createRef(); 
 
@@ -81,8 +85,34 @@ const Home = () => {
     setModalVisible(false);
   };
 
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  handleLogout = async () => {
+    try {
+      await AsyncStorage.clear()
+      navigation.navigate("Bienvenido")
+    } catch (e) {
+      console.log(e)
+    }
+  };
+
+
+
   return (
     <View style={styles.container}>
+       <TouchableOpacity
+              style={styles.menuButton}
+              onPress={() => setMenuVisible(!menuVisible)}
+            >
+              <SimpleLineIcons style={styles.textmenu} name="menu" size={24} color="black" />
+        </TouchableOpacity>
+
+       <TouchableOpacity
+              style={styles.menuButton2}
+              onPress={() => setMenuVisible(!menuVisible)}
+            >
+              <AntDesign style={styles.textmenu} name="sharealt" size={28} color="black" />
+        </TouchableOpacity>
       {(Platform.OS === 'ios' || Platform.OS === 'android') && (
         <MapView
           ref={mapRef}
@@ -143,38 +173,76 @@ const Home = () => {
         </View>
       </Modal>
 
+      <Modal
+      animationType="fade"
+      transparent={true}
+      visible={menuVisible}
+      onRequestClose={() => setMenuVisible(false)}
+     >
+      <TouchableOpacity
+        style={styles.modalOverlay}
+        onPress={() => setMenuVisible(false)}
+      ></TouchableOpacity>
+      <View style={styles.menuContainer}>
+        <Image
+        style={styles.tinyLogo}
+        source={require('../../assets/img/1.png')}
+        />
+        <View style={styles.menuItem}>
+          <Text style={styles.menuItemTitle}>CuidadSegura</Text>
+        </View>
+        <TouchableOpacity
+          style={styles.menuItem}
+        >
+          <Text style={styles.menuItemText}>Mis incidentes</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.menuItem}
+        >
+          <Text style={styles.menuItemText}>Comunidad</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={styles.menuItem}
+        >
+          <Text style={styles.menuItemText}>Ayuda</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.menuItem}
+        >
+          <Text style={styles.menuItemText}>Terminos y condiciones</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={handleLogout}
+        >
+          <Text style={styles.menuItemText3}>Cerrar sesión</Text>
+        </TouchableOpacity>
+        
+      </View>
+    </Modal>
+
+
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.callButton}
           onPress={() => callPhoneNumber('555555555')}
         >
-          <Image
-        style={styles.image}
-        source={require('../../assets/img/policia.png')}
-        />
-          <Text style={styles.callButtonText}>Policia</Text>
+         <MaterialCommunityIcons name="police-badge" size={30} color="white" style={styles.buttonText} />
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.callButton2}
           onPress={() => callPhoneNumber('555555555')}
         >
-           <Image
-        style={styles.image}
-        source={require('../../assets/img/doctor.png')}
-        />
-          <Text style={styles.callButtonText}>Ambulancia</Text>
+          <FontAwesome name="ambulance" size={30} color="white" style={styles.buttonText}/>
         </TouchableOpacity>
         
         <TouchableOpacity
           style={styles.callButton3}
           onPress={() => callPhoneNumber('555555555')}
         >
-          <Image
-        style={styles.image}
-        source={require('../../assets/img/bombero.png')}
-        />
-          <Text style={styles.callButtonText}>Bomberos</Text>
+         <FontAwesome name="fire-extinguisher" size={30} color="white" style={styles.buttonText}/>
         </TouchableOpacity>
       </View>
       </View>
@@ -187,6 +255,73 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'center',
   },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },  
+  menuButton: {
+    position: 'absolute',
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    borderRadius: 30,
+    top: 50,
+    left: 20,
+    zIndex: 10,
+  },
+  menuButton2: {
+    position: 'absolute',
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    borderRadius: 30,
+    top: 50,
+    right: 20,
+    zIndex: 10,
+  },
+  tinyLogo: {
+    position: 'relative',
+    width: '100%',
+    height: 100,
+    marginTop:30,
+    
+  },
+  textmenu: {
+    padding: 10,
+    color: 'white'
+  },
+  buttonText: {
+    padding:10
+  },
+  menuContainer: {
+    position: 'absolute',
+    backgroundColor: 'white',
+    borderTopEndRadius: 30,
+    borderBottomEndRadius: 10,
+    top: 0,
+    left: 0,
+    width: 175,
+    height: '100%',
+    padding: 10,
+    elevation: 4,
+    zIndex: 100,
+  },
+  menuItem: {
+    alignItems: 'center',
+    marginTop:15,
+    paddingVertical: 10,
+  },
+  menuItemText: {
+    fontSize: 'auto',
+    color: 'black',
+  },  
+  menuItemText3: {
+    marginTop: 420,
+    fontSize: 'auto',
+    color: 'red',
+  },  
+  menuItemTitle: {
+    fontSize: 20,
+    color: 'black',
+  },  
   map: {
     ...StyleSheet.absoluteFillObject,
   },
@@ -201,30 +336,28 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   callButton: {
-    margin: 20,
-    backgroundColor: 'blue',
+    margin: 30,
+    backgroundColor: 'rgb(41, 128, 185)',
     padding: 10,
-    borderRadius: 50,
-    marginTop: 10,
+    borderRadius: 100,
     alignItems: 'center',
   },
   callButtonText: {
     color: 'white',
   },
   callButton2: {
-    margin: 20,
-    backgroundColor: 'green',
+    margin: 30,
+    backgroundColor: 'rgb(39, 174, 96)',
     padding: 10,
-    borderRadius: 50,
-    marginTop: 10,
+    borderRadius: 100,
+    
     alignItems: 'center',
   },
   callButton3: {
-    margin: 20,
-    backgroundColor: 'red',
+    margin: 30,
+    backgroundColor: 'rgb(231,76,60)',
     padding: 10,
-    borderRadius: 50,
-    marginTop: 10,
+    borderRadius: 100,
     alignItems: 'center',
   },
   titulomodal:{
@@ -264,6 +397,57 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     color: 'white',
+  },
+  button: {
+    alignItems: 'center',
+    backgroundColor: '#FCFCFD',
+    borderRadius: 4,
+    borderWidth: 0,
+    elevation: 3,
+    shadowColor: 'rgba(45, 35, 66, 0.4)',
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    shadowOpacity: 1,
+    borderColor: 'transparent',
+    boxSizing: 'border-box',
+    color: '#36395A',
+    cursor: 'pointer', // Not applicable in React Native
+    display: 'flex',
+    fontFamily: 'JetBrains Mono',
+    height: 48,
+    justifyContent: 'center',
+    lineHeight: 1,
+    overflow: 'hidden',
+    paddingHorizontal: 16,
+    position: 'relative',
+    textAlign: 'left', // Not applicable in React Native
+    textDecorationLine: 'none', // Not applicable in React Native
+    transitionProperty: 'box-shadow, transform',
+    transitionDuration: 150,
+    userSelect: 'none', // Not applicable in React Native
+    touchAction: 'manipulation', // Not applicable in React Native
+    whiteSpace: 'nowrap',
+    willChange: 'box-shadow, transform',
+    fontSize: 18,
+  },
+  focusedButton: {
+    shadowColor: '#D6D6E7',
+    shadowOffset: { width: 0, height: 0 },
+    shadowRadius: 1.5,
+    borderColor: '#D6D6E7',
+    elevation: 0,
+  },
+  hoveredButton: {
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 8,
+    elevation: 3,
+    transform: [{ translateY: -2 }],
+  },
+  pressedButton: {
+    shadowColor: '#D6D6E7',
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 7,
+    transform: [{ translateY: 2 }],
   },
 });
 
