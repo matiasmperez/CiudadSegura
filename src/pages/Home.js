@@ -6,6 +6,9 @@ import * as Location from 'expo-location';
 import { Linking } from 'react-native';
 import { SimpleLineIcons, MaterialCommunityIcons, FontAwesome , AntDesign} from '@expo/vector-icons'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import BouncyCheckbox from "react-native-bouncy-checkbox";
+import url from '../../constants/url';
+import axios from 'axios';
 
 
 
@@ -16,6 +19,13 @@ const Home = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [newMarkerCoords, setNewMarkerCoords] = useState(null);
   const [noteText, setNoteText] = useState('');
+  
+  const [selectedIncident, setSelectedIncident] = useState(null);
+
+  handleIncidentSelection = (incidentType) => {
+    setSelectedIncident(incidentType);
+  };
+  
 
   const [intervalId, setIntervalId] = useState(null); 
 
@@ -32,7 +42,7 @@ const Home = ({navigation}) => {
         clearInterval(intervalId);
       }
     };
-  }, []); 
+  }, [selectedIncident]); 
 
   const updateLocation = async () => {
     try {
@@ -44,6 +54,7 @@ const Home = ({navigation}) => {
 
       let updatedLocation = await Location.getCurrentPositionAsync({});
       setLocation(updatedLocation);
+
     } catch (error) {
       console.error(error);
     }
@@ -96,8 +107,24 @@ const Home = ({navigation}) => {
   };
 
   const saveNoteAndCloseModal = () => {
-    // Aquí puedes realizar el guardado de la nota asociada al marcador
+    sendIncident();
     setModalVisible(false);
+  };
+  
+
+  const sendIncident = async () => {
+    try {
+      console.log()
+      await axios.post(url + 'api/incidentes', {
+        tipo: selectedIncident,
+        latitude: newMarkerCoords.latitude,
+        longitude: newMarkerCoords.longitude,
+        detalle: noteText, 
+      });
+  
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const [menuVisible, setMenuVisible] = useState(false);
@@ -143,6 +170,8 @@ const Home = ({navigation}) => {
               }}
               title="Mi Ubicación"
               onPress={focusOnMarker}
+              image={require('../../assets/img/ubicacion.png')}
+              pinColor=''
             />
           )}
           {newMarkerCoords && (
@@ -164,9 +193,144 @@ const Home = ({navigation}) => {
           <Text style={styles.titulomodal}>
             Incidente
           </Text>
+
+          <View style={styles.checkboxContainer2}>
+
+            <View style={styles.checkboxContainer}>
+
+            <View style={styles.checkboxContainer2}>
+              <BouncyCheckbox
+                size={25}
+                style={styles.checkbox}
+                fillColor={selectedIncident === 'Robo' ? 'rgb(41, 128, 185)' : '#FFFFFF'}
+                unfillColor="#FFFFFF"
+                iconStyle={{ borderColor: "blue" }}
+                innerIconStyle={{ borderWidth: 2 }}
+                textStyle={{ color: 'white', fontWeight: 'bold'}}
+                onPress={() => handleIncidentSelection('Robo')}
+          
+              />
+              <Text style={styles.label}>Robo</Text>
+            </View>
+
+            <View style={styles.checkboxContainer2}>
+              <BouncyCheckbox
+                size={25}
+                style={styles.checkbox}
+                fillColor={selectedIncident === 'Hurto' ? 'rgb(41, 128, 185)' : '#FFFFFF'}
+                unfillColor="#FFFFFF"
+                iconStyle={{ borderColor: "blue" }}
+                innerIconStyle={{ borderWidth: 2 }}
+                textStyle={{ color: 'white', fontWeight: 'bold'}}
+                onPress={() => handleIncidentSelection('Hurto')}
+          
+              />
+              <Text style={styles.label}>Hurto</Text>
+            </View>
+
+            <View style={styles.checkboxContainer2}>
+              <BouncyCheckbox
+                size={25}
+                style={styles.checkbox}
+                fillColor={selectedIncident === 'Asalto a propiedad' ? 'rgb(41, 128, 185)' : '#FFFFFF'}
+                unfillColor="#FFFFFF"
+                iconStyle={{ borderColor: "blue" }}
+                innerIconStyle={{ borderWidth: 2 }}
+                textStyle={{ color: 'white', fontWeight: 'bold'}}
+                onPress={() => handleIncidentSelection('Asalto a propiedad')}
+          
+              />
+              <Text style={styles.label}>Asalto a propiedad</Text>
+            </View>
+
+            <View style={styles.checkboxContainer2}>
+              <BouncyCheckbox
+                size={25}
+                style={styles.checkbox}
+                fillColor={selectedIncident === 'Vandalismo' ? 'rgb(41, 128, 185)' : '#FFFFFF'}
+                unfillColor="#FFFFFF"
+                iconStyle={{ borderColor: "blue" }}
+                innerIconStyle={{ borderWidth: 2 }}
+                textStyle={{ color: 'white', fontWeight: 'bold'}}
+                onPress={() => handleIncidentSelection('Vandalismo')}
+          
+              />
+              <Text style={styles.label}>Vandalismo</Text>
+            </View>
+
+            </View>
+            
+            <View style={styles.checkboxContainer}>
+
+            <View style={styles.checkboxContainer2}>
+            <BouncyCheckbox
+              size={25}
+              style={styles.checkbox}
+              fillColor={selectedIncident === 'Delito sexual' ? 'rgb(41, 128, 185)' : '#FFFFFF'}
+              unfillColor="#FFFFFF"
+              iconStyle={{ borderColor: "blue" }}
+              innerIconStyle={{ borderWidth: 2 }}
+              textStyle={{ color: 'white', fontWeight: 'bold'}}
+              onPress={() => handleIncidentSelection('Delito sexual')}
+        
+            />
+            <Text style={styles.label}>Delito sexual</Text>
+            </View>
+
+            <View style={styles.checkboxContainer2}>
+            <BouncyCheckbox
+              size={25}
+              style={styles.checkbox}
+              fillColor={selectedIncident === 'Incendio' ? 'rgb(41, 128, 185)' : '#FFFFFF'}
+              unfillColor="#FFFFFF"
+              iconStyle={{ borderColor: "blue" }}
+              innerIconStyle={{ borderWidth: 2 }}
+              textStyle={{ color: 'white', fontWeight: 'bold'}}
+              onPress={() => handleIncidentSelection('Incendio')}
+        
+            />
+            <Text style={styles.label}>Incendio</Text>
+            </View>
+
+            <View style={styles.checkboxContainer2}>
+            <BouncyCheckbox
+              size={25}
+              style={styles.checkbox}
+              fillColor={selectedIncident === 'Saqueo' ? 'rgb(41, 128, 185)' : '#FFFFFF'}
+              unfillColor="#FFFFFF"
+              iconStyle={{ borderColor: "blue" }}
+              innerIconStyle={{ borderWidth: 2 }}
+              textStyle={{ color: 'white', fontWeight: 'bold'}}
+              onPress={() => handleIncidentSelection('Saqueo')}
+        
+            />
+            <Text style={styles.label}>Saqueo</Text>
+            </View>
+
+            <View style={styles.checkboxContainer2}>
+            <BouncyCheckbox
+              size={25}
+              style={styles.checkbox}
+              fillColor={selectedIncident === 'Otro' ? 'rgb(41, 128, 185)' : '#FFFFFF'}
+              unfillColor="#FFFFFF"
+              iconStyle={{ borderColor: "blue" }}
+              innerIconStyle={{ borderWidth: 2 }}
+              textStyle={{ color: 'white', fontWeight: 'bold'}}
+              onPress={() => handleIncidentSelection('Otro')}
+        
+            />
+            <Text style={styles.label}>Otro</Text>
+            </View>
+            </View>
+          </View>
+
           <TextInput
+            editable
+            multiline
+            numberOfLines={4}
+            maxLength={200}
             style={styles.noteInput}
-            placeholder="Agregar incidente"
+            placeholder="Detalles del incidente"
             value={noteText}
             onChangeText={setNoteText}
           />
@@ -387,8 +551,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.75)',
   },
   noteInput: {
-    width: 200,
-    height: 40,
+    width: 370,
+    height: 100,
     borderWidth: 1,
     backgroundColor: 'white',
     borderColor: 'black',
@@ -463,6 +627,22 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     shadowRadius: 7,
     transform: [{ translateY: 2 }],
+  },
+  checkboxContainer2: {
+    flexDirection: 'row',
+    margin: 10
+  },
+  checkboxContainer: {
+    flexDirection: 'column',
+    margin: 10,
+  },
+  checkbox: {
+    alignSelf: 'center',
+  },
+  label: {
+    margin: 0,
+    fontSize: 18,
+    color: 'white'
   },
 });
 
