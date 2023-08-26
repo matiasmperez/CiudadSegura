@@ -17,26 +17,41 @@ const Home = ({navigation}) => {
   const [newMarkerCoords, setNewMarkerCoords] = useState(null);
   const [noteText, setNoteText] = useState('');
 
-  const mapRef = React.createRef(); 
+  const [intervalId, setIntervalId] = useState(null); 
 
   useEffect(() => {
-    (async () => {
-      if (Platform.OS === 'android' && !Device.isDevice) {
-        setErrorMsg(
-          'La función no funcionará en el emulador de Android'
-        );
-        return;
+    const id = setInterval(() => {
+      updateLocation(); 
+    }, 5000);
+
+    setIntervalId(id); 
+
+    return () => {
+     
+      if (intervalId !== null) {
+        clearInterval(intervalId);
       }
+    };
+  }, []); 
+
+  const updateLocation = async () => {
+    try {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         setErrorMsg('Se denegó el permiso para acceder a la ubicación');
         return;
       }
 
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-    })();
-  }, []);
+      let updatedLocation = await Location.getCurrentPositionAsync({});
+      setLocation(updatedLocation);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
+  const mapRef = React.createRef(); 
+
 
   useLayoutEffect(() => {
     if (location && mapRef.current) {
