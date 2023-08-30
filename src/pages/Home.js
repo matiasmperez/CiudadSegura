@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { View, StyleSheet, Platform, Text, TouchableOpacity, Image, Modal, TextInput } from 'react-native';
+import { View, StyleSheet, Platform, Text, TouchableOpacity, Image, Modal, TextInput, } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import Device from 'expo-device';
 import * as Location from 'expo-location';
@@ -79,6 +79,7 @@ const Home = ({navigation}) => {
         },
       });
       const allIncidents = response.data.data;
+      console.log(iduser)
      
 
       const filteredMyIncidents = iduser ? allIncidents.filter(incident => incident._idusuario === iduser) : [];
@@ -92,24 +93,26 @@ const Home = ({navigation}) => {
   };
   
   const sendIncident = async () => {
-    try {
-      await axios.post(
-        url + 'api/incidentes',
-        {
-          tipo: selectedIncident,
-          latitude: newMarkerCoords.latitude,
-          longitude: newMarkerCoords.longitude,
-          detalle: noteText,
+  try {
+    await axios.post(
+      url + 'api/incidentes',
+      {
+        tipo: selectedIncident,
+        latitude: newMarkerCoords.latitude,
+        longitude: newMarkerCoords.longitude,
+        detalle: noteText,
+        _idusuario: iduser,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${jwt}`, 
         },
-        {
-          headers: {
-            Authorization: `Bearer ${jwt}`, 
-          },
-        }
-      );
-    } catch (error) {
-      console.error(error);
-    }
+      }
+    );
+    alert("Incidente cargado correctamente");
+  } catch (error) {
+    console.error(error);
+  }
   };
 
   const updateLocation = async () => {
