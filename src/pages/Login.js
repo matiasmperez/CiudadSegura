@@ -26,9 +26,8 @@ const Login = (props) => {
       .then(response => {
         handleClean()
         props.navigation.navigate("Home")
-        storeData(response.data.jwt)
+        storeData(response.data.jwt, response.data.id)
         
-
 
       })
       .catch(error => {
@@ -38,9 +37,10 @@ const Login = (props) => {
    
   }
 
-  const storeData = async (value) => {
+  const storeData = async (value,value2) => {
     try {
       await AsyncStorage.setItem('jwt', value);
+      await AsyncStorage.setItem('id', value2);
     } catch (e) {
       console.log(e)
     }

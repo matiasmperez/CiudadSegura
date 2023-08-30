@@ -10,7 +10,8 @@ const Bienvenido = ({ navigation }) => {
     const getData = async () => {
       try {
         const value = await AsyncStorage.getItem('jwt');
-        if (value !== null) {
+        const id = await AsyncStorage.getItem('id');
+        if (value !== null && id !== null) {
           navigation.navigate('Home');
         }
       } catch (e) {
@@ -40,7 +41,7 @@ const Bienvenido = ({ navigation }) => {
         style={styles.tinyLogo}
         source={require('../../assets/img/1.png')}
         />
-          <Text style={styles.title}>CuidadSegura</Text>
+          <Text style={styles.title}>CiudadSegura</Text>
           <Text style={styles.subtitle}>Seguridad que construimos juntos.</Text>
           <Button bgColor={Colors.secondary} textColor={Colors.white} btnLabel="Iniciar sesión" Press={handleLoginPress} />
           <View style={{marginBottom: 10}}></View>

@@ -14,11 +14,15 @@ import axios from 'axios';
 
 
 const Home = ({navigation}) => {
+  const [jwt, setJwt] = useState(null); 
+  const [iduser, setIduser] = useState(null); 
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [newMarkerCoords, setNewMarkerCoords] = useState(null);
   const [noteText, setNoteText] = useState('');
+  const [incidents, setIncidents] = useState([]);
+  const [myIncidents, setmyIncidents] = useState([]);
   
   const [selectedIncident, setSelectedIncident] = useState(null);
 
@@ -30,11 +34,15 @@ const Home = ({navigation}) => {
   const [intervalId, setIntervalId] = useState(null); 
 
   useEffect(() => {
-    const id = setInterval(() => {
-      updateLocation(); 
-    }, 5000);
 
-    setIntervalId(id); 
+    getData();
+
+    const time = setInterval(() => {
+      updateLocation(); 
+      
+    }, 1000);
+    
+    setIntervalId(time);
 
     return () => {
      
@@ -43,6 +51,66 @@ const Home = ({navigation}) => {
       }
     };
   }, [selectedIncident]); 
+
+  useEffect(() => {
+    if (jwt && iduser) {
+      fetchIncidents();
+    }
+  }, [jwt, iduser]);
+
+  const getData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('jwt');
+      const value2 = await AsyncStorage.getItem('id');
+      if (value !== null && value2 !== null) {
+        setJwt(value);
+        setIduser(value2);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const fetchIncidents = async () => {
+    try {
+      const response = await axios.get(url + 'api/incidentes', {
+        headers: {
+          Authorization: `Bearer ${jwt}`, 
+        },
+      });
+      const allIncidents = response.data.data;
+     
+
+      const filteredMyIncidents = iduser ? allIncidents.filter(incident => incident._idusuario === iduser) : [];
+      
+      
+      setmyIncidents(filteredMyIncidents);
+      setIncidents(allIncidents.filter(incident => incident._idusuario !== iduser));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
+  const sendIncident = async () => {
+    try {
+      await axios.post(
+        url + 'api/incidentes',
+        {
+          tipo: selectedIncident,
+          latitude: newMarkerCoords.latitude,
+          longitude: newMarkerCoords.longitude,
+          detalle: noteText,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${jwt}`, 
+          },
+        }
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const updateLocation = async () => {
     try {
@@ -72,19 +140,19 @@ const Home = ({navigation}) => {
         latitudeDelta: 0.02, 
         longitudeDelta: 0.02,
       };
-      mapRef.current.animateToRegion(initialRegion, 1000); 
+      mapRef.current.animateToRegion(initialRegion, 500); 
     }
   }, [location]);
 
   const focusOnMarker = () => {
     if (mapRef.current) {
-      mapRef.current.animateToRegion(initialRegion, 1000);
+      mapRef.current.animateToRegion(initialRegion, 500);
     }
   };
 
   let initialRegion = {
-    latitude: 37.78825,
-    longitude: -122.4324,
+    latitude: -34.921388,
+    longitude: -57.954587,
     latitudeDelta: 0.02, 
     longitudeDelta: 0.02,
   };
@@ -111,21 +179,6 @@ const Home = ({navigation}) => {
     setModalVisible(false);
   };
   
-
-  const sendIncident = async () => {
-    try {
-      console.log()
-      await axios.post(url + 'api/incidentes', {
-        tipo: selectedIncident,
-        latitude: newMarkerCoords.latitude,
-        longitude: newMarkerCoords.longitude,
-        detalle: noteText, 
-      });
-  
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const [menuVisible, setMenuVisible] = useState(false);
 
@@ -174,12 +227,30 @@ const Home = ({navigation}) => {
               pinColor=''
             />
           )}
-          {newMarkerCoords && (
+          {incidents.map(incident => (
+          <Marker
+            key={incident._id}
+            coordinate={{
+              latitude: parseFloat(incident.latitude),
+              longitude: parseFloat(incident.longitude),
+            }}
+            title={incident.tipo}
+            description={incident.detalle}
+          >
+            <View style={styles.incidentCircle} />
+          </Marker>
+          ))}
+          {myIncidents.map(incident => (
             <Marker
-              coordinate={newMarkerCoords}
-              title="Nuevo Marcador"
+              key={incident._id}
+              coordinate={{
+                latitude: parseFloat(incident.latitude),
+                longitude: parseFloat(incident.longitude),
+              }}
+              title={incident.tipo}
+              description={incident.detalle}
             />
-          )}
+          ))}
         </MapView>
       )}
       
@@ -368,7 +439,7 @@ const Home = ({navigation}) => {
         source={require('../../assets/img/1.png')}
         />
         <View style={styles.menuItem}>
-          <Text style={styles.menuItemTitle}>CuidadSegura</Text>
+          <Text style={styles.menuItemTitle}>CiudadSegura</Text>
         </View>
         <TouchableOpacity
           style={styles.menuItem}
@@ -482,6 +553,15 @@ const styles = StyleSheet.create({
     padding: 10,
     elevation: 4,
     zIndex: 100,
+  },
+  incidentCircle: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: 'rgba(231,76,60,0.65)',
+    border: 5,
+    borderColor: 'red'
+  
   },
   menuItem: {
     alignItems: 'center',
