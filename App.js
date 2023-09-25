@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { Login, Bienvenido, Register, Olvidopassword, Home, Modal } from './src/pages/';
+import { Login, Bienvenido, Register, Olvidopassword, Home, Modal, Comunidad } from './src/pages/';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -15,6 +15,7 @@ export default function App() {
         <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
         <Stack.Screen name="Recuperacion" component={Olvidopassword} options={{ headerShown: false }} />
         <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
+        <Stack.Screen name="Comunidad" component={Comunidad} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -23,6 +23,7 @@ const Home = ({navigation}) => {
   const [noteText, setNoteText] = useState('');
   const [incidents, setIncidents] = useState([]);
   const [myIncidents, setmyIncidents] = useState([]);
+  const [selectedIncidentForEdit, setSelectedIncidentForEdit] = useState(null);
   
   const [selectedIncident, setSelectedIncident] = useState(null);
 
@@ -30,6 +31,20 @@ const Home = ({navigation}) => {
     setSelectedIncident(incidentType);
   };
   
+  const saveEditedIncidentAndCloseModal = async () => {
+    try {
+      setSelectedIncidentForEdit(null);
+      setModalVisible(false);
+      setSelectedIncident(null);
+      setNoteText('');
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const navegar = () => {
+    navigation.navigate("Comunidad");
+  }
 
   const [intervalId, setIntervalId] = useState(null); 
 
@@ -40,7 +55,7 @@ const Home = ({navigation}) => {
     const time = setInterval(() => {
       updateLocation(); 
       
-    }, 1000);
+    }, 5000);
     
     setIntervalId(time);
 
@@ -79,7 +94,6 @@ const Home = ({navigation}) => {
         },
       });
       const allIncidents = response.data.data;
-      console.log(iduser)
      
 
       const filteredMyIncidents = iduser ? allIncidents.filter(incident => incident._idusuario === iduser) : [];
@@ -180,6 +194,8 @@ const Home = ({navigation}) => {
   const saveNoteAndCloseModal = () => {
     sendIncident();
     setModalVisible(false);
+    setSelectedIncident(null);
+    setNoteText('');
   };
   
 
@@ -258,14 +274,17 @@ const Home = ({navigation}) => {
       )}
       
       <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
+       animationType="slide"
+       transparent={true}
+       visible={modalVisible || selectedIncidentForEdit !== null}
+       onRequestClose={() => {
+         setModalVisible(false);
+         setSelectedIncidentForEdit(null);
+       }}
       >
         <View style={styles.modalContainer}>
           <Text style={styles.titulomodal}>
-            Incidente
+            {selectedIncidentForEdit ? "Editar Incidente" : "Nuevo Incidente"}
           </Text>
 
           <View style={styles.checkboxContainer2}>
@@ -399,31 +418,52 @@ const Home = ({navigation}) => {
           </View>
 
           <TextInput
-            editable
-            multiline
-            numberOfLines={4}
-            maxLength={200}
-            style={styles.noteInput}
-            placeholder="Detalles del incidente"
-            value={noteText}
-            onChangeText={setNoteText}
-          />
+      editable
+      multiline
+      numberOfLines={4}
+      maxLength={200}
+      style={styles.noteInput}
+      placeholder="Detalles del incidente"
+      value={noteText}
+      onChangeText={setNoteText}
+    />
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.saveButton}
-            onPress={saveNoteAndCloseModal}
-          >
-            <Text style={styles.saveButtonText}>Guardar Incidente</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={saveNoteAndCloseModal}
-          >
-            <Text style={styles.cancelButtonText}>Cancelar</Text>
-          </TouchableOpacity>
-        </View>
-        </View>
+    {selectedIncidentForEdit ? ( 
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.saveButton}
+          onPress={saveEditedIncidentAndCloseModal}
+        >
+          <Text style={styles.saveButtonText}>Guardar Cambios</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.cancelButton}
+          onPress={() => {
+            setSelectedIncidentForEdit(null);
+            setModalVisible(false);
+          }}
+        >
+          <Text style={styles.cancelButtonText}>Cancelar</Text>
+        </TouchableOpacity>
+      </View>
+    ) : ( 
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.saveButton}
+          onPress={saveNoteAndCloseModal}
+        >
+          <Text style={styles.saveButtonText}>Guardar Incidente</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.cancelButton}
+          onPress={() => setModalVisible(false)}
+        >
+          <Text style={styles.cancelButtonText}>Cancelar</Text>
+        </TouchableOpacity>
+      </View>
+    )}
+  </View>
+        
       </Modal>
 
       <Modal
@@ -451,6 +491,7 @@ const Home = ({navigation}) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.menuItem}
+          onPress={navegar}
         >
           <Text style={styles.menuItemText}>Comunidad</Text>
         </TouchableOpacity>
