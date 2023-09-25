@@ -40,7 +40,7 @@ const Home = ({navigation}) => {
     const time = setInterval(() => {
       updateLocation(); 
       
-    }, 1000);
+    }, 40000);
     
     setIntervalId(time);
 
