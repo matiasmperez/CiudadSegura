@@ -45,6 +45,9 @@ const Home = ({navigation}) => {
   const navegar = () => {
     navigation.navigate("Comunidad");
   }
+  const navegarEstadisticas = () => {
+    navigation.navigate("Estadisticas");
+  }
 
   const [intervalId, setIntervalId] = useState(null); 
 
@@ -55,7 +58,7 @@ const Home = ({navigation}) => {
     const time = setInterval(() => {
       updateLocation(); 
       
-    }, 5000);
+    }, 40000);
     
     setIntervalId(time);
 
@@ -486,8 +489,9 @@ const Home = ({navigation}) => {
         </View>
         <TouchableOpacity
           style={styles.menuItem}
+          onPress={navegarEstadisticas}
         >
-          <Text style={styles.menuItemText}>Mis incidentes</Text>
+          <Text style={styles.menuItemText}>Estadísticas</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.menuItem}

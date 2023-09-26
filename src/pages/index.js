@@ -4,6 +4,7 @@ import Register from "./Register.js";
 import Olvidopassword from "./Olvidopassword.js";
 import Home from "./Home.js";
 import Comunidad from "./Comunidad.js";
+import Estadisticas from "./Estadisticas.js";
 
 
 export{
@@ -12,5 +13,6 @@ export{
     Register,
     Olvidopassword,
     Home,
-    Comunidad
+    Comunidad,
+    Estadisticas
 }
