@@ -93,27 +93,30 @@ const Home = ({navigation}) => {
   };
   
   const sendIncident = async () => {
-  try {
-    await axios.post(
-      url + 'api/incidentes',
-      {
-        tipo: selectedIncident,
-        latitude: newMarkerCoords.latitude,
-        longitude: newMarkerCoords.longitude,
-        detalle: noteText,
-        _idusuario: iduser,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${jwt}`, 
+    try {
+      await axios.post(
+        url + 'api/incidentes',
+        {
+          tipo: selectedIncident,
+          latitude: newMarkerCoords.latitude,
+          longitude: newMarkerCoords.longitude,
+          detalle: noteText,
+          _idusuario: iduser,
         },
-      }
-    );
-    alert("Incidente cargado correctamente");
-  } catch (error) {
-    console.error(error);
-  }
+        {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
+        }
+      );
+      alert("Incidente cargado correctamente");
+      // Después de agregar un incidente, actualiza la lista de incidentes.
+      fetchIncidents();
+    } catch (error) {
+      console.error(error);
+    }
   };
+  
 
   const updateLocation = async () => {
     try {
@@ -176,6 +179,10 @@ const Home = ({navigation}) => {
     setNewMarkerCoords(event.nativeEvent.coordinate);
     setModalVisible(true);
   };
+
+  const closeModal = () =>{
+    setModalVisible(false);
+  }
 
   const saveNoteAndCloseModal = () => {
     sendIncident();
@@ -418,7 +425,7 @@ const Home = ({navigation}) => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.cancelButton}
-            onPress={saveNoteAndCloseModal}
+            onPress={closeModal}
           >
             <Text style={styles.cancelButtonText}>Cancelar</Text>
           </TouchableOpacity>
