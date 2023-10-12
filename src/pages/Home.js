@@ -48,6 +48,12 @@ const Home = ({navigation}) => {
   const navegarEstadisticas = () => {
     navigation.navigate("Estadisticas");
   }
+  const navegarAyuda = () => {
+    navigation.navigate("Ayuda");
+  }
+  const navegarTerminos = () => {
+    navigation.navigate("Terminos");
+  }
 
   const [intervalId, setIntervalId] = useState(null); 
 
@@ -502,11 +508,13 @@ const Home = ({navigation}) => {
         
         <TouchableOpacity
           style={styles.menuItem}
+          onPress={navegarAyuda}
         >
           <Text style={styles.menuItemText}>Ayuda</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.menuItem}
+          onPress={navegarTerminos}
         >
           <Text style={styles.menuItemText}>Terminos y condiciones</Text>
         </TouchableOpacity>
