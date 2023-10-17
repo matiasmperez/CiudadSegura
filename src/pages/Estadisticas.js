@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import url from '../../constants/url';
 import axios from 'axios';
@@ -70,24 +70,29 @@ const Estadisticas = ({ navigation }) => {
         Estadísticas de incidentes
       </Text>
 
-      {Object.keys(groupedEstadisticas).map((ciudad, index) => (
-        <View key={index} style={styles.ciudadContainer}>
-          <Text style={styles.ciudadTitle}>Ciudad: {ciudad}</Text>
-          {groupedEstadisticas[ciudad].map((estadistica, estadisticaIndex) => (
-            <View key={estadisticaIndex} style={styles.estadisticasContainer}>
-              <Text>Fecha: {estadistica.fecha}</Text>
-              <Text>Homicidio: {estadistica.Homicidio}</Text>
-              <Text>Asalto a propiedad: {estadistica.Asaltoapropiedad}</Text>
-              <Text>Hurto: {estadistica.Hurto}</Text>
-              <Text>Vandalismo: {estadistica.Vandalismo}</Text>
-              <Text>Delito sexual: {estadistica.Delitosexual}</Text>
-              <Text>Incendio: {estadistica.Incendio}</Text>
-              <Text>Saqueo: {estadistica.Saqueo}</Text>
-              <Text>Otro: {estadistica.Otro}</Text>
-            </View>
-          ))}
-        </View>
-      ))}
+      <FlatList
+      style={styles.flatContainer}
+        data={Object.keys(groupedEstadisticas)}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.ciudadContainer}>
+            <Text style={styles.ciudadTitle}>Ciudad: {item}</Text>
+            {groupedEstadisticas[item].map((estadistica, estadisticaIndex) => (
+              <View key={estadisticaIndex} style={styles.estadisticasContainer}>
+                <Text>Fecha: {estadistica.fecha}</Text>
+                <Text>Homicidio: {estadistica.Homicidio}</Text>
+                <Text>Asalto a propiedad: {estadistica.Asaltoapropiedad}</Text>
+                <Text>Hurto: {estadistica.Hurto}</Text>
+                <Text>Vandalismo: {estadistica.Vandalismo}</Text>
+                <Text>Delito sexual: {estadistica.Delitosexual}</Text>
+                <Text>Incendio: {estadistica.Incendio}</Text>
+                <Text>Saqueo: {estadistica.Saqueo}</Text>
+                <Text>Otro: {estadistica.Otro}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+      />
     </View>
   );
 };
@@ -110,6 +115,14 @@ const styles = StyleSheet.create({
     padding: 10,
     color: 'white',
   },
+  flatContainer: {
+    borderWidth: 0.5,
+    borderColor: '#ccc',
+    borderRadius: 4,
+    padding: 20,
+    marginBottom: 16,
+    width: '90%',
+  },
   ciudadContainer: {
     borderWidth: 1,
     borderColor: '#ccc',
@@ -123,7 +136,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   estadisticasContainer: {
-    borderWidth: 1,
+    borderWidth: 0,
     borderColor: '#ccc',
     borderRadius: 4,
     padding: 10,
