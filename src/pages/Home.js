@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { View, StyleSheet, Platform, Text, TouchableOpacity, Image, Modal, TextInput, } from 'react-native';
+import { View, StyleSheet, Platform, Text, TouchableOpacity, Image, Modal, TextInput, Keyboard} from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import Device from 'expo-device';
 import * as Location from 'expo-location';
@@ -30,6 +30,13 @@ const Home = ({navigation}) => {
   handleIncidentSelection = (incidentType) => {
     setSelectedIncident(incidentType);
   };
+
+  cerrarTeclado = () => {
+    // Realiza alguna acción aquí si es necesario
+    // Luego, cierra el teclado
+    this.textInput.clear(); // Esto limpia el contenido del TextInput
+    this.textInput.blur(); // Esto quita el foco y cierra el teclado
+  }
   
   const saveEditedIncidentAndCloseModal = async () => {
     try {
@@ -172,7 +179,7 @@ const Home = ({navigation}) => {
 
   const focusOnMarker = () => {
     if (mapRef.current) {
-      mapRef.current.animateToRegion(initialRegion, 500);
+      mapRef.current.animateToRegion(initialRegion, 1000);
     }
   };
 
@@ -435,6 +442,11 @@ const Home = ({navigation}) => {
       placeholder="Detalles del incidente"
       value={noteText}
       onChangeText={setNoteText}
+      onKeyPress={(event) => {
+        if (event.nativeEvent.key === 'Enter') {
+          Keyboard.dismiss(); // Cierra el teclado
+        }
+      }}
     />
 
     {selectedIncidentForEdit ? ( 

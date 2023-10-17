@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity,Keyboard } from 'react-native';
 import { Button, Card } from 'react-native-paper';
 import { AntDesign } from '@expo/vector-icons';
 import url from '../../constants/url';
@@ -106,6 +106,11 @@ const Comunidad = ({ navigation }) => {
           value={titulo}
           onChangeText={(text) => setTitulo(text)}
           style={styles.input}
+          onKeyPress={(event) => {
+            if (event.nativeEvent.key === 'Enter') {
+              Keyboard.dismiss(); // Cierra el teclado
+            }
+          }}
         />
 
         <TextInput
@@ -114,6 +119,11 @@ const Comunidad = ({ navigation }) => {
           onChangeText={(text) => setDetalle(text)}
           style={[styles.input, { height: 100 }]}
           multiline
+          onKeyPress={(event) => {
+            if (event.nativeEvent.key === 'Enter') {
+              Keyboard.dismiss(); // Cierra el teclado
+            }
+          }}
         />
         <Button mode="contained" onPress={handlePost}>
           Publicar

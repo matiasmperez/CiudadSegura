@@ -1,36 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { Button, Card } from 'react-native-paper';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import url from '../../constants/url';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Estadisticas = ({ navigation }) => {
-
-  const [jwt, setJwt] = useState(null); 
+  const [jwt, setJwt] = useState(null);
   const [iduser, setIduser] = useState(null);
   const [estadisticas, setEstadisticas] = useState([]);
- 
+
   useEffect(() => {
-
-    axios.get(url + 'api/ciudades', {
-     
-    })
-    .then((response) => {
-      setEstadisticas(response.data.data);
-      console.log(response.data.data)
-    })
-    .catch((error) => {
-      console.error('Error al obtener estadísticas:', error);
-    });
+    axios
+      .get(url + 'api/ciudades', {})
+      .then((response) => {
+        setEstadisticas(response.data.data);
+        console.log(response.data.data);
+      })
+      .catch((error) => {
+        console.error('Error al obtener estadísticas:', error);
+      });
   }, [jwt]);
-  
 
-  
   useEffect(() => {
     getData();
-  }); 
+  });
+
   const getData = async () => {
     try {
       const value = await AsyncStorage.getItem('jwt');
@@ -48,8 +43,25 @@ const Estadisticas = ({ navigation }) => {
     navigation.navigate('Home');
   };
 
+  // Función para agrupar las estadísticas por ciudad
+  const groupEstadisticasByCiudad = (estadisticas) => {
+    const groupedEstadisticas = {};
+
+    estadisticas.forEach((estadistica) => {
+      const ciudad = estadistica.ciudad;
+      if (!groupedEstadisticas[ciudad]) {
+        groupedEstadisticas[ciudad] = [];
+      }
+      groupedEstadisticas[ciudad].push(estadistica);
+    });
+
+    return groupedEstadisticas;
+  };
+
+  const groupedEstadisticas = groupEstadisticasByCiudad(estadisticas);
+
   return (
-   <View style={styles.container}>
+    <View style={styles.container}>
       <TouchableOpacity style={styles.menuButton} onPress={navegar}>
         <AntDesign style={styles.textmenu} name="back" size={24} color="black" />
       </TouchableOpacity>
@@ -58,11 +70,11 @@ const Estadisticas = ({ navigation }) => {
         Estadísticas de incidentes
       </Text>
 
-      {estadisticas.length > 0 && (
-        <View style={styles.estadisticasContainer}>
-          {estadisticas.map((estadistica, index) => (
-            <View key={index}>
-              <Text>Ciudad: {estadistica.ciudad}</Text>
+      {Object.keys(groupedEstadisticas).map((ciudad, index) => (
+        <View key={index} style={styles.ciudadContainer}>
+          <Text style={styles.ciudadTitle}>Ciudad: {ciudad}</Text>
+          {groupedEstadisticas[ciudad].map((estadistica, estadisticaIndex) => (
+            <View key={estadisticaIndex} style={styles.estadisticasContainer}>
               <Text>Fecha: {estadistica.fecha}</Text>
               <Text>Homicidio: {estadistica.Homicidio}</Text>
               <Text>Asalto a propiedad: {estadistica.Asaltoapropiedad}</Text>
@@ -75,7 +87,7 @@ const Estadisticas = ({ navigation }) => {
             </View>
           ))}
         </View>
-      )}
+      ))}
     </View>
   );
 };
@@ -98,13 +110,24 @@ const styles = StyleSheet.create({
     padding: 10,
     color: 'white',
   },
-  estadisticasContainer: {
+  ciudadContainer: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 4,
     padding: 20,
     marginBottom: 16,
     width: '90%',
+  },
+  ciudadTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  estadisticasContainer: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 4,
+    padding: 10,
+    marginBottom: 10,
   },
 });
 
