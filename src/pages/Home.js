@@ -27,6 +27,17 @@ const Home = ({navigation}) => {
   
   const [selectedIncident, setSelectedIncident] = useState(null);
 
+  const incidentColors = {
+    Robo: 'rgba(231, 76, 60, 0.65)', // Rojo para el tipo "Robo"
+    Hurto: 'rgba(52, 152, 219, 0.65)', // Azul para el tipo "Hurto"
+    'Asalto a propiedad': 'rgba(46, 204, 113, 0.65)', // Verde para el tipo "Asalto a propiedad"
+    Vandalismo: 'rgba(230, 126, 34, 0.65)', // Naranja para el tipo "Vandalismo"
+    'Delito sexual': 'rgba(186, 83, 158, 0.65)', // Violeta para el tipo "Delito sexual"
+    Incendio: 'rgba(240, 98, 146, 0.65)', // Rosa para el tipo "Incendio"
+    Saqueo: 'rgba(101, 198, 187, 0.65)', // Celeste para el tipo "Saqueo"
+    Otro: 'rgba(169, 169, 169, 0.65)', // Gris para el tipo "Otro"
+  };
+
   handleIncidentSelection = (incidentType) => {
     setSelectedIncident(incidentType);
   };
@@ -67,16 +78,21 @@ const Home = ({navigation}) => {
   useEffect(() => {
 
     getData();
+    fetchIncidentsAndUpdate(); // Llamada inicial
+    const updateInterval = setInterval(fetchIncidentsAndUpdate, 10000); // Actualiza cada 10 segundos
+
 
     const time = setInterval(() => {
       updateLocation(); 
       
-    }, 1000);
+    }, 5000);
     
     setIntervalId(time);
 
     return () => {
-     
+      if (updateInterval) {
+        clearInterval(updateInterval); // Limpia el intervalo al desmontar el componente
+      }
       if (intervalId !== null) {
         clearInterval(intervalId);
       }
@@ -84,8 +100,9 @@ const Home = ({navigation}) => {
   }, [selectedIncident]); 
 
   useEffect(() => {
+    
     if (jwt && iduser) {
-      fetchIncidents();
+      fetchIncidentsAndUpdate();
     }
   }, [jwt, iduser]);
 
@@ -102,19 +119,18 @@ const Home = ({navigation}) => {
     }
   };
 
-  const fetchIncidents = async () => {
+  const fetchIncidentsAndUpdate = async () => {
     try {
       const response = await axios.get(url + 'api/incidentes', {
         headers: {
-          Authorization: `Bearer ${jwt}`, 
+          Authorization: `Bearer ${jwt}`,
         },
       });
+  
       const allIncidents = response.data.data;
-     
-
+  
       const filteredMyIncidents = iduser ? allIncidents.filter(incident => incident._idusuario === iduser) : [];
-      
-      
+  
       setmyIncidents(filteredMyIncidents);
       setIncidents(allIncidents.filter(incident => incident._idusuario !== iduser));
     } catch (error) {
@@ -262,19 +278,26 @@ const Home = ({navigation}) => {
               pinColor=''
             />
           )}
-          {incidents.map(incident => (
-          <Marker
-            key={incident._id}
-            coordinate={{
-              latitude: parseFloat(incident.latitude),
-              longitude: parseFloat(incident.longitude),
-            }}
-            title={incident.tipo}
-            description={incident.detalle}
-          >
-            <View style={styles.incidentCircle} />
-          </Marker>
-          ))}
+          {incidents.map((incident) => (
+  <Marker
+    key={incident._id}
+    coordinate={{
+      latitude: parseFloat(incident.latitude),
+      longitude: parseFloat(incident.longitude),
+    }}
+    title={incident.tipo}
+    description={incident.detalle}
+  >
+    <View style={{
+      width: 25,
+      height: 25,
+      borderRadius: 20,
+      backgroundColor: incidentColors[incident.tipo] || 'rgba(231, 76, 60, 0.65)', // Rojo predeterminado si no se encuentra el tipo
+      border: 5,
+      borderColor: 'red',
+    }} />
+  </Marker>
+))}
           {myIncidents.map(incident => (
             <Marker
               key={incident._id}
@@ -621,15 +644,6 @@ const styles = StyleSheet.create({
     padding: 10,
     elevation: 4,
     zIndex: 100,
-  },
-  incidentCircle: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: 'rgba(231,76,60,0.65)',
-    border: 5,
-    borderColor: 'red'
-  
   },
   menuItem: {
     alignItems: 'center',
