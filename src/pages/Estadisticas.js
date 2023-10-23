@@ -4,6 +4,7 @@ import { AntDesign } from '@expo/vector-icons';
 import url from '../../constants/url';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { PieChart } from 'react-native-chart-kit';
 
 const Estadisticas = ({ navigation }) => {
   const [jwt, setJwt] = useState(null);
@@ -71,25 +72,71 @@ const Estadisticas = ({ navigation }) => {
       </Text>
 
       <FlatList
-      style={styles.flatContainer}
+        style={styles.flatContainer}
         data={Object.keys(groupedEstadisticas)}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View style={styles.ciudadContainer}>
             <Text style={styles.ciudadTitle}>Ciudad: {item}</Text>
-            {groupedEstadisticas[item].map((estadistica, estadisticaIndex) => (
-              <View key={estadisticaIndex} style={styles.estadisticasContainer}>
-                <Text>Fecha: {estadistica.fecha}</Text>
-                <Text>Homicidio: {estadistica.Homicidio}</Text>
-                <Text>Asalto a propiedad: {estadistica.Asaltoapropiedad}</Text>
-                <Text>Hurto: {estadistica.Hurto}</Text>
-                <Text>Vandalismo: {estadistica.Vandalismo}</Text>
-                <Text>Delito sexual: {estadistica.Delitosexual}</Text>
-                <Text>Incendio: {estadistica.Incendio}</Text>
-                <Text>Saqueo: {estadistica.Saqueo}</Text>
-                <Text>Otro: {estadistica.Otro}</Text>
-              </View>
-            ))}
+            
+            {/* Gráfico de torta para cada localidad */}
+            <PieChart
+              data={
+                [
+                  {
+                    name: 'Homicidio',
+                    population: groupedEstadisticas[item].reduce((acc, estadistica) => acc + estadistica.Homicidio, 0),
+                    color: '#' + ((1 << 24) * Math.random() | 0).toString(16),
+                  },
+                  {
+                    name: 'Asalto a propiedad',
+                    population: groupedEstadisticas[item].reduce((acc, estadistica) => acc + estadistica.Asaltoapropiedad, 0),
+                    color: '#' + ((1 << 24) * Math.random() | 0).toString(16),
+                  },
+                  {
+                    name: 'Hurto',
+                    population: groupedEstadisticas[item].reduce((acc, estadistica) => acc + estadistica.Hurto, 0),
+                    color: '#' + ((1 << 24) * Math.random() | 0).toString(16),
+                  },
+                  {
+                    name: 'Vandalismo',
+                    population: groupedEstadisticas[item].reduce((acc, estadistica) => acc + estadistica.Vandalismo, 0),
+                    color: '#' + ((1 << 24) * Math.random() | 0).toString(16),
+                  },
+                  {
+                    name: 'Delito sexual',
+                    population: groupedEstadisticas[item].reduce((acc, estadistica) => acc + estadistica.Delitosexual, 0),
+                    color: '#' + ((1 << 24) * Math.random() | 0).toString(16),
+                  },
+                  {
+                    name: 'Incendio',
+                    population: groupedEstadisticas[item].reduce((acc, estadistica) => acc + estadistica.Incendio, 0),
+                    color: '#' + ((1 << 24) * Math.random() | 0).toString(16),
+                  },
+                  {
+                    name: 'Saqueo',
+                    population: groupedEstadisticas[item].reduce((acc, estadistica) => acc + estadistica.Saqueo, 0),
+                    color: '#' + ((1 << 24) * Math.random() | 0).toString(16),
+                  },
+                  {
+                    name: 'Otro',
+                    population: groupedEstadisticas[item].reduce((acc, estadistica) => acc + estadistica.Otro, 0),
+                    color: '#' + ((1 << 24) * Math.random() | 0).toString(16),
+                  },
+                ]
+              }
+              width={300}
+              height={200}
+              chartConfig={{
+                backgroundGradientFrom: '#fff',
+                backgroundGradientTo: '#fff',
+                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+              }}
+              accessor="population"
+              backgroundColor="transparent"
+              paddingLeft="15"
+              center={[10, 10]}
+            />
           </View>
         )}
       />
@@ -121,15 +168,15 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 20,
     marginBottom: 16,
-    width: '90%',
+    width: '95%',
   },
   ciudadContainer: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 4,
-    padding: 20,
+    padding: 10,
     marginBottom: 16,
-    width: '90%',
+    width: '100%',
   },
   ciudadTitle: {
     fontSize: 20,
@@ -139,7 +186,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     borderColor: '#ccc',
     borderRadius: 4,
-    padding: 10,
+    padding: 5,
     marginBottom: 10,
   },
 });
