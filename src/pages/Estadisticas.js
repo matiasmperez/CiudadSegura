@@ -94,6 +94,10 @@ const Estadisticas = ({ navigation }) => {
         onChangeText={(text) => setFiltroCiudad(text)}
       />
 
+      <Text style={{ fontSize: 11, fontWeight: 'bold', marginBottom: 16, marginTop: 5 }}>
+        Estos datos son de los ultimos 30 dias.
+      </Text>
+
       <FlatList
         style={styles.flatContainer}
         data={ciudadesFiltradas}
