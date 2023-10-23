@@ -16,6 +16,7 @@ const Comunidad = ({ navigation }) => {
   const [apellidoUsuario,setApellidoUsuario] = useState('');
   const [emailUsuario,setEmailUsuario] = useState('');
   const [fechaActual, setFechaActual] = useState('');
+  const [noHayPublicaciones, setNoHayPublicaciones] = useState(true);
 
   useEffect(() => {
     const obtenerFechaActual = () => {
@@ -27,20 +28,45 @@ const Comunidad = ({ navigation }) => {
       setFechaActual(formattedDate);
     };
 
+    axios
+    .get(url + 'api/publishes', {})
+    .then((response) => {
+      if (response.data.data.length === 0) {
+        setNoHayPublicaciones(true);
+      } else {
+        setNoHayPublicaciones(false);
+        setPosts(response.data.data);
+      }
+    })
+    .catch((error) => {
+      console.error('Error al obtener estadísticas:', error);
+    });
+    
     obtenerFechaActual();
   }, []);
 
-  const handlePost = () => {
+  const handlePost = async () => {
     if (titulo && detalle) {
       const newPost = {
-        titulo: titulo,
-        detalle: detalle,
-        encargado: `${apellidoUsuario}, ` + `${nombreUsuario}`,
-        fecha: fechaActual,
+        _iduser: iduser,
+        title: titulo,
+        publish: detalle,
+        date: fechaActual,
       };
-      setPosts([...posts, newPost]);
-      setTitulo('');
-      setDetalle('');
+      try {
+        const response = await axios.post(url + 'api/publishes', newPost, {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
+        });
+
+        // Actualiza la lista de publicaciones después de la creación exitosa
+        setPosts([...posts, response.data.data]);
+        setTitulo('');
+        setDetalle('');
+      } catch (error) {
+        console.error('Error al crear una publicación:', error);
+      }
     }
   };
 
@@ -135,17 +161,25 @@ const Comunidad = ({ navigation }) => {
       </Text>
 
       <FlatList
-        style={{ width: '90%'}}
-        data={posts}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <Card style={{ marginVertical: 8, padding: 10, marginLeft: 5, marginRight: 5}}>
-            <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.titulo}</Text>
-            <Text style={{ fontSize: 14 }}>{item.detalle}</Text>
-            <Text style={{ fontSize: 10, fontWeight: 'bold' }}>{item.encargado}  {item.fecha}  </Text>
-          </Card>
-        )}
-      />
+  style={{ width: '90%' }}
+  data={noHayPublicaciones ? [{}] : posts}
+  keyExtractor={(item, index) => index.toString()}
+  renderItem={({ item }) => {
+    if (noHayPublicaciones) {
+      return (
+        <Text style={styles.noPostsMessage}>No hay publicaciones por el momento</Text>
+      );
+    } else {
+      return (
+        <Card style={{ marginVertical: 8, padding: 10, marginLeft: 5, marginRight: 5 }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.title}</Text>
+          <Text style={{ fontSize: 14 }}>{item.publish}</Text>
+          <Text style={{ fontSize: 10, fontWeight: 'bold' }}>{item._iduser} {item.date}</Text>
+        </Card>
+      );
+    }
+  }}
+/>
     </View>
   );
 };
@@ -184,6 +218,12 @@ const styles = StyleSheet.create({
     padding: 8,
     marginBottom: 16,
     fontSize: 16,
+  },
+  noPostsMessage: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 20, // Ajusta este valor según tu diseño
   },
 });
 

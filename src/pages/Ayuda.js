@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Linking} from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 
 const Ayuda = ({ navigation }) => {
@@ -14,6 +14,8 @@ const Ayuda = ({ navigation }) => {
         { label: 'Otro', color: 'gray' },
     ];
 
+    const url = 'https://ccat.sas.upenn.edu/romance/spanish/219/01prehistoria/paiseslatinos.html';
+
 
     const renderItem = ({ item }) => (
         <View style={styles.item}>
@@ -24,6 +26,11 @@ const Ayuda = ({ navigation }) => {
 
     const navegar = () => {
         navigation.navigate('Home');
+    };
+
+    const abrirEnlace = () => {
+       
+        Linking.openURL(url)
     };
 
     return (
@@ -58,6 +65,10 @@ const Ayuda = ({ navigation }) => {
 
             <Text style={styles.text}>
                 En caso de una emergencia tiene los 3 botones de emergencia situados en la parte baja del mapa para realizar la llamada a las autoridades.
+            </Text>
+
+            <Text style={styles.text}>
+                Tenga en cuenta que la funcionalidad de llamar a las autoridades está disponible en países de <Text style={{fontWeight: 'bold', textDecorationLine: 'underline'}} onPress={abrirEnlace} >América Latina</Text>.
             </Text>
 
         </View>
