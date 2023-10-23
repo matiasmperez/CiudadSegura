@@ -655,7 +655,6 @@ const styles = StyleSheet.create({
     color: 'black',
   },  
   menuItemText3: {
-    marginTop: 420,
     fontSize: 'auto',
     color: 'red',
   },  

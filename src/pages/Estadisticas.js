@@ -84,8 +84,8 @@ const Estadisticas = ({ navigation }) => {
               data={
                 [
                   {
-                    name: 'Homicidio',
-                    population: groupedEstadisticas[item].reduce((acc, estadistica) => acc + estadistica.Homicidio, 0),
+                    name: 'Robo',
+                    population: groupedEstadisticas[item].reduce((acc, estadistica) => acc + estadistica.Robo, 0),
                     color: '#' + ((1 << 24) * Math.random() | 0).toString(16),
                   },
                   {
@@ -125,7 +125,7 @@ const Estadisticas = ({ navigation }) => {
                   },
                 ]
               }
-              width={300}
+              width={320}
               height={200}
               chartConfig={{
                 backgroundGradientFrom: '#fff',
@@ -183,6 +183,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   estadisticasContainer: {
+    backgroundColor: 'black',
     borderWidth: 0,
     borderColor: '#ccc',
     borderRadius: 4,
