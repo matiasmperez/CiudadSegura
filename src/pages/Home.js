@@ -55,7 +55,6 @@ const Home = ({navigation}) => {
 
     if (postToDelete) {
       try {
-        console.log(postToDelete._id)
         // Realiza la solicitud DELETE al servidor
         await axios.delete(url + `api/incidentes/${postToDelete._id}`, {
           headers: {
@@ -185,7 +184,7 @@ const Home = ({navigation}) => {
       });
   
       const allIncidents = response.data.data;
-      console.log(response.data.data)
+
   
       const filteredMyIncidents = iduser ? allIncidents.filter(incident => incident._idusuario === iduser) : [];
   
