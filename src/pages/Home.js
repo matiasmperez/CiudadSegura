@@ -44,7 +44,7 @@ const Home = ({navigation}) => {
   };
 
   const handleDeleteIncident = (post) => {
-    // Muestra el diálogo de confirmación para borrar la publicación
+
     setPostToDelete(post);
     setDeleteConfirmationVisible(true);
   };
@@ -55,17 +55,14 @@ const Home = ({navigation}) => {
 
     if (postToDelete) {
       try {
-        // Realiza la solicitud DELETE al servidor
-        await axios.delete(url + `api/incidentes/${postToDelete._id}`, {
+
+        await axios.delete(url + `api/incidentes/${postToDelete}`, {
           headers: {
             Authorization: `Bearer ${jwt}`,
           },
         });
 
-        // Si la eliminación fue exitosa, actualiza el estado para reflejar la eliminación
-        setPosts((prevPosts) => prevPosts.filter((p) => p._id !== postToDelete._id));
-        // Limpia la publicación que se va a eliminar
-        setPostToDelete(null);
+      
       } catch (error) {
         console.error('Error al eliminar el incidente:', error);
       }
