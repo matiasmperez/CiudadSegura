@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { View, StyleSheet, Platform, Text, TouchableOpacity, Image, Modal, TextInput, Keyboard} from 'react-native';
+import { View, StyleSheet, Platform, Text, TouchableOpacity, Image, Modal, TextInput, Keyboard, Linking} from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import Device from 'expo-device';
 import * as Location from 'expo-location';
-import { Linking } from 'react-native';
+import { Share } from 'react-native';
 import { SimpleLineIcons, MaterialCommunityIcons, FontAwesome , AntDesign} from '@expo/vector-icons'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
@@ -242,6 +242,26 @@ const Home = ({navigation}) => {
     }
   };
 
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        title: 'CiudadSegura: Tu Compañero para una Ciudad Más Segura',
+        message: 'Descarga CiudadSegura y únete a nuestra comunidad comprometida con la seguridad en la ciudad. ¡Juntos podemos crear un entorno más seguro para todos! ',
+        url: 'https://play.google.com/store/apps/details?id=nic.goi.aarogyasetu&hl=en',
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  };
 
 
   return (
@@ -255,7 +275,7 @@ const Home = ({navigation}) => {
 
        <TouchableOpacity
               style={styles.menuButton2}
-              onPress={() => setMenuVisible(!menuVisible)}
+              onPress={onShare}
             >
               <AntDesign style={styles.textmenu} name="sharealt" size={28} color="black" />
         </TouchableOpacity>
