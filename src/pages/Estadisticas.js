@@ -26,7 +26,7 @@ const Estadisticas = ({ navigation }) => {
 
   useEffect(() => {
     getData();
-  });
+  },[jwt]);
 
   const getData = async () => {
     try {
