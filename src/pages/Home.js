@@ -3,12 +3,14 @@ import { View, StyleSheet, Platform, Text, TouchableOpacity, Image, Modal, TextI
 import MapView, { Marker } from 'react-native-maps';
 import Device from 'expo-device';
 import * as Location from 'expo-location';
+import { Button } from 'react-native-paper'
 import { Share } from 'react-native';
 import { SimpleLineIcons, MaterialCommunityIcons, FontAwesome , AntDesign} from '@expo/vector-icons'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import url from '../../constants/url';
 import axios from 'axios';
+import Dialog, { SlideAnimation } from 'react-native-popup-dialog';
 
 
 
@@ -27,6 +29,9 @@ const Home = ({navigation}) => {
   
   const [selectedIncident, setSelectedIncident] = useState(null);
 
+  const [deleteConfirmationVisible, setDeleteConfirmationVisible] = useState(false);
+  const [postToDelete, setPostToDelete] = useState(null);
+
   const incidentColors = {
     Robo: 'rgba(231, 76, 60, 0.65)', // Rojo para el tipo "Robo"
     Hurto: 'rgba(52, 152, 219, 0.65)', // Azul para el tipo "Hurto"
@@ -36,6 +41,36 @@ const Home = ({navigation}) => {
     Incendio: 'rgba(240, 98, 146, 0.65)', // Rosa para el tipo "Incendio"
     Saqueo: 'rgba(101, 198, 187, 0.65)', // Celeste para el tipo "Saqueo"
     Otro: 'rgba(169, 169, 169, 0.65)', // Gris para el tipo "Otro"
+  };
+
+  const handleDeleteIncident = (post) => {
+    // Muestra el diálogo de confirmación para borrar la publicación
+    setPostToDelete(post);
+    setDeleteConfirmationVisible(true);
+  };
+
+  const handleDeleteConfirmation = async () => {
+    // Cierra el diálogo de confirmación
+    setDeleteConfirmationVisible(false);
+
+    if (postToDelete) {
+      try {
+        console.log(postToDelete._id)
+        // Realiza la solicitud DELETE al servidor
+        await axios.delete(url + `api/incidentes/${postToDelete._id}`, {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
+        });
+
+        // Si la eliminación fue exitosa, actualiza el estado para reflejar la eliminación
+        setPosts((prevPosts) => prevPosts.filter((p) => p._id !== postToDelete._id));
+        // Limpia la publicación que se va a eliminar
+        setPostToDelete(null);
+      } catch (error) {
+        console.error('Error al eliminar el incidente:', error);
+      }
+    }
   };
 
   handleIncidentSelection = (incidentType) => {
@@ -79,7 +114,17 @@ const Home = ({navigation}) => {
 
     getData();
     fetchIncidentsAndUpdate(); // Llamada inicial
-    const updateInterval = setInterval(fetchIncidentsAndUpdate, 10000); // Actualiza cada 10 segundos
+    const updateInterval = setInterval(fetchIncidentsAndUpdate, 1000); // Actualiza cada 1 segundos
+
+    if (location && mapRef.current) {
+      const initialRegion = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.02, 
+        longitudeDelta: 0.02,
+      };
+      mapRef.current.animateToRegion(initialRegion, 500); 
+    }
 
 
     const time = setInterval(() => {
@@ -118,6 +163,18 @@ const Home = ({navigation}) => {
       console.log(e);
     }
   };
+
+  const centerMapOnLocation = () => {
+    if (mapRef.current && location) {
+      const newRegion = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.02,
+        longitudeDelta: 0.02,
+      };
+      mapRef.current.animateToRegion(newRegion, 1000);
+    }
+  };  
 
   const fetchIncidentsAndUpdate = async () => {
     try {
@@ -181,17 +238,6 @@ const Home = ({navigation}) => {
   const mapRef = React.createRef(); 
 
 
-  useLayoutEffect(() => {
-    if (location && mapRef.current) {
-      const initialRegion = {
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.02, 
-        longitudeDelta: 0.02,
-      };
-      mapRef.current.animateToRegion(initialRegion, 500); 
-    }
-  }, [location]);
 
   const focusOnMarker = () => {
     if (mapRef.current) {
@@ -279,6 +325,12 @@ const Home = ({navigation}) => {
             >
               <AntDesign style={styles.textmenu} name="sharealt" size={28} color="black" />
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.menuButton3}
+          onPress={centerMapOnLocation}
+        >
+          <FontAwesome style={styles.textmenu} name="location-arrow" size={12} color="black"></FontAwesome>
+        </TouchableOpacity>
       {(Platform.OS === 'ios' || Platform.OS === 'android') && (
         <MapView
           ref={mapRef}
@@ -327,7 +379,9 @@ const Home = ({navigation}) => {
               }}
               title={incident.tipo}
               description={incident.detalle}
-            />
+              onSelect={() => handleDeleteIncident(incident._id)}
+            >
+            </Marker>
           ))}
         </MapView>
       )}
@@ -606,6 +660,19 @@ const Home = ({navigation}) => {
          <FontAwesome name="fire-extinguisher" size={30} color="white" style={styles.buttonText}/>
         </TouchableOpacity>
       </View>
+
+      <Dialog
+        visible={deleteConfirmationVisible}
+        dialogAnimation={new SlideAnimation({ slideFrom: 'bottom' })}
+        onTouchOutside={() => setDeleteConfirmationVisible(false)}
+      >
+        <View style={{padding: 20}}>
+          <Text style={{fontSize: 20, fontWeight: 'bold', textAlign: 'center'}}>¿Estás seguro de que deseas eliminar esta publicación?</Text>
+          <Button title="Eliminar" onPress={handleDeleteConfirmation} style={{backgroundColor: "red", padding: 0, margin: 20, marginTop: 30}}><Text style={{color:"white",fontSize:16}}>Eliminar</Text></Button>
+          <Button title="Cancelar" onPress={() => setDeleteConfirmationVisible(false)} style={{backgroundColor: "grey", padding: 0, margin: 20, marginTop: 10}}><Text style={{color:"white",fontSize:16}}>Cancelar</Text></Button>
+        </View>
+      </Dialog>
+
       </View>
   );
 };
@@ -636,6 +703,14 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     top: 50,
     right: 20,
+    zIndex: 10,
+  },
+  menuButton3: {
+    position: 'absolute',
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    borderRadius: 30,
+    top: 120,
+    right: 30,
     zIndex: 10,
   },
   tinyLogo: {
@@ -671,11 +746,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   menuItemText: {
-    fontSize: 'auto',
     color: 'black',
   },  
   menuItemText3: {
-    fontSize: 'auto',
     color: 'red',
   },  
   menuItemTitle: {
