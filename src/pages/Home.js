@@ -185,6 +185,7 @@ const Home = ({navigation}) => {
       });
   
       const allIncidents = response.data.data;
+      console.log(response.data.data)
   
       const filteredMyIncidents = iduser ? allIncidents.filter(incident => incident._idusuario === iduser) : [];
   
@@ -357,8 +358,8 @@ const Home = ({navigation}) => {
       latitude: parseFloat(incident.latitude),
       longitude: parseFloat(incident.longitude),
     }}
-    title={incident.tipo}
-    description={incident.detalle}
+    title={incident.tipo + " - " + incident.fecha}
+    description={incident.detalle }
   >
     <View style={{
       width: 25,
@@ -377,7 +378,7 @@ const Home = ({navigation}) => {
                 latitude: parseFloat(incident.latitude),
                 longitude: parseFloat(incident.longitude),
               }}
-              title={incident.tipo}
+              title={incident.tipo + " - " + incident.fecha}
               description={incident.detalle}
               onSelect={() => handleDeleteIncident(incident._id)}
             >
