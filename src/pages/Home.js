@@ -664,7 +664,7 @@ const Home = ({navigation}) => {
         onTouchOutside={() => setDeleteConfirmationVisible(false)}
       >
         <View style={{padding: 20}}>
-          <Text style={{fontSize: 20, fontWeight: 'bold', textAlign: 'center'}}>¿Estás seguro de que deseas eliminar esta publicación?</Text>
+          <Text style={{fontSize: 20, fontWeight: 'bold', textAlign: 'center'}}>¿Estás seguro de que deseas eliminar este incidente?</Text>
           <Button title="Eliminar" onPress={handleDeleteConfirmation} style={{backgroundColor: "red", padding: 0, margin: 20, marginTop: 30}}><Text style={{color:"white",fontSize:16}}>Eliminar</Text></Button>
           <Button title="Cancelar" onPress={() => setDeleteConfirmationVisible(false)} style={{backgroundColor: "grey", padding: 0, margin: 20, marginTop: 10}}><Text style={{color:"white",fontSize:16}}>Cancelar</Text></Button>
         </View>
