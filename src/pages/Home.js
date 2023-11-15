@@ -32,6 +32,10 @@ const Home = ({navigation}) => {
   const [deleteConfirmationVisible, setDeleteConfirmationVisible] = useState(false);
   const [postToDelete, setPostToDelete] = useState(null);
 
+  const [policia,setPolicia] = useState("");
+  const [ambulancia,setAmbulancia] = useState("");
+  const [bomberos,setBomberos] = useState("");
+
   const incidentColors = {
     Robo: 'rgba(231, 76, 60, 0.65)', // Rojo para el tipo "Robo"
     Hurto: 'rgba(52, 152, 219, 0.65)', // Azul para el tipo "Hurto"
@@ -112,6 +116,7 @@ const Home = ({navigation}) => {
     fetchIncidentsAndUpdate(); // Llamada inicial
     const updateInterval = setInterval(fetchIncidentsAndUpdate, 1000); // Actualiza cada 1 segundos
 
+    fetchLocalidad();
     if (location && mapRef.current) {
       const initialRegion = {
         latitude: location.coords.latitude,
@@ -272,6 +277,25 @@ const Home = ({navigation}) => {
     setSelectedIncident(null);
     setNoteText('');
   };
+
+  const fetchLocalidad = async () => {
+    if (location && location.coords) {
+      try {
+        const response = await axios.post(url + "api/pais", {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
+        setPolicia(response.data.data.policia);
+        setAmbulancia(response.data.data.ambulancia)
+        setBomberos(response.data.data.bombero)
+      } catch (error) {
+        console.error('Error al obtener la localidad:', error);
+      }
+    } else {
+      console.error('Location es nulo o no tiene la propiedad coords.');
+    }
+  };
+  
   
 
   const [menuVisible, setMenuVisible] = useState(false);
@@ -638,21 +662,21 @@ const Home = ({navigation}) => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.callButton}
-          onPress={() => callPhoneNumber('555555555')}
+          onPress={() => callPhoneNumber(policia)}
         >
          <MaterialCommunityIcons name="police-badge" size={30} color="white" style={styles.buttonText} />
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.callButton2}
-          onPress={() => callPhoneNumber('555555555')}
+          onPress={() => callPhoneNumber(ambulancia)}
         >
           <FontAwesome name="ambulance" size={30} color="white" style={styles.buttonText}/>
         </TouchableOpacity>
         
         <TouchableOpacity
           style={styles.callButton3}
-          onPress={() => callPhoneNumber('555555555')}
+          onPress={() => callPhoneNumber(bomberos)}
         >
          <FontAwesome name="fire-extinguisher" size={30} color="white" style={styles.buttonText}/>
         </TouchableOpacity>
