@@ -1,3 +1,3 @@
-const url = "https://ciudadsegurabackend-development.up.railway.app/"
+const url = "https://ciudadsegura.cloud/"
 
 export default url;
